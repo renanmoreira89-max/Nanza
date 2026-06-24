@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle Financeiro</title>
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1A3C38">
+    
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    
+    <link class="favicon-png" rel="icon" type="image/png" sizes="192x192" href="1000320254.png">
+    <link class="favicon-png" rel="icon" type="image/png" sizes="512x512" href="1000320254.png">
+    <link class="manifest" href="manifest.json">
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+    <style>
+        :root {
+            --primary: #1A3C38;       
+            --accent: #4FA085;        
+            --verde: #00B466;
+            --accent-dark: #35726A;   
+            --accent-light: #4FA085;  
+            --income: #209F8B;        
+            --expense: #D62E3F;       
+            --background: #F0F0F0;    
+            --card-bg: #ffffff;
+            --text-secondary: #66807D; 
+            --border-color: #999999;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        }
+
+        html, body {
+            overflow-x: hidden; 
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--primary);
+            padding: 20px 16px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-left: 4px;
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .menu-toggle-btn {
+            width: auto;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background-color: var(--accent);
+            color: white;
+            font-weight: bold;
+            border: 1px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(79, 160, 149, 0.2);
+            transition: background 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .menu-toggle-btn:hover {
+            background-color: var(--accent-dark);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 380px;
+            border-radius: 22px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            overflow: hidden;
+            animation: modalFadeIn 0.25s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.93); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--accent-light);
+        }
+
+        .modal-header h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            width: auto;
+            padding: 4px;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .sync-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sync-container p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .form-group-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sync-container input {
+            padding: 12px;
+            font-size: 0.95rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background-color: #f8fafc;
+            color: var(--primary);
+            width: 100%;
+            outline: none;
+        }
+
+        .sync-container input:focus {
+            border-color: var(--accent);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(79, 160, 149, 0.15);
+        }
+
+        .sync-container button {
+            padding: 12px;
+            font-size: 0.95rem;
+            border-radius: 25px;
+            width: 100%;
+        }
+
+        .sync-status {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .card.balance {
+            grid-column: 1 / -1;
+            background: var(--primary);
+            color: #ffffff;
+        }
+        
+        .card.balance h3 { color: #a3b8b6; }
+        .card.balance p { color: var(--verde) !important; }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.015);
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+
+        .card p {
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+
+        @media(min-width: 480px) {
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .card.balance {
+                grid-column: 1 / 3;
+            }
+        }
+
+        .card.income p { color: var(--income); }
+        .card.expense p { color: var(--expense); }
+
+        .form-container {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.015);
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .form-group input, .form-group select {
+            flex: 1;
+            min-width: 130px;
+        }
+
+        input, select, button {
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            background-color: #f8fafc;
+            border-radius: 22px;
+            font-size: 1.1rem;
+            outline: none;
+            color: var(--primary);
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(79, 160, 149, 0.15);
+        }
+
+        select option {
+            background-color: #ffffff !important;
+            color: #1A3C38 !important;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            border-radius: 25px;
+            width: 100%;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button.btn-accent {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        button.btn-accent:hover {
+            background-color: var(--accent-dark);
+        }
+
+        .transactions-container {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 22px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.015);
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        .transactions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .transactions-container h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .filters-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .filters-container input, .filters-container select {
+            flex: 1;
+            min-width: 130px;
+            padding: 8px 12px;
+            font-size: 1rem;
+            height: 40px;
+        }
+
+        .filters-container input {
+            flex: 2;
+        }
+
+        .category-total-badge {
+            flex: 1;
+            min-width: 140px;
+            height: 40px;
+            background-color: var(--accent);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 22px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            padding: 0 12px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        th, td {
+            padding: 14px 10px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.8rem;
+        }
+
+        th {
+            background-color: #ffffff;
+            color: var(--text-secondary);
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        .badge-category {
+            background-color: #f1f3f5;
+            color: #495050;
+        }
+
+        .badge-info {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        .badge-danger {
+            background-color: #dc3545;
+            color: #ffffff;
+        }
+
+        td.income { color: var(--income); font-weight: 600; }
+        td.expense { color: var(--expense); font-weight: 600; }
+
+        .btn-edit {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            margin: 0 2px;
+        }
+
+        .btn-danger-clear {
+            background-color: var(--expense);
+            color: white;
+            width: auto;
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="modal-overlay" id="sync-modal" onclick="closeModal(event)">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Sincronização & Nuvem</h2>
+                <button class="close-btn" onclick="toggleModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="sync-container">
+                    <p>Insira uma chave compartilhada para sincronizar suas finanças em tempo real com outros dispositivos.</p>
+                    <div class="form-group-vertical">
+                        <input type="text" id="sync-key" placeholder="Digite sua chave">
+                        <button type="button" class="btn-accent" id="btn-connect" onclick="connectToFirebase()">Conectar e Sincronizar</button>
+                    </div>
+                    <div class="sync-status" id="sync-status">Verificando configuração do servidor...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1 style="font-size: 33px;">Controle Financeiro</h1>
+            <button class="menu-toggle-btn" id="menu-toggle-btn" onclick="toggleModal()">Sinc.</button>
+        </header>
+
+        <div class="dashboard">
+            <div class="card balance">
+                <h3 style="font-size: 17px;">Saldo</h3>
+                <p style="font-size: 35px;" id="balance-display">R$ 0,00</p>
+            </div>
+            <div class="card income">
+                <h3 style="font-size: 17px;">Receitas</h3>
+                <p id="income-display">R$ 0,00</p>
+            </div>
+            <div class="card expense">
+                <h3 style="font-size: 17px;">Despesas</h3>
+                <p id="expense-display">R$ 0,00</p>
+            </div>
+        </div>
+
+        <div class="form-container">
+            <form id="transaction-form">
+                <div class="form-group">
+                    <input type="text" id="description" placeholder="Descrição" required>
+                    <input type="number" id="amount" placeholder="Valor (R$)" step="0.01" required>
+                    <select id="type" onchange="handleTypeChange()">
+                        <option value="expense" selected>Despesa</option>
+                        <option value="income">Receita</option>
+                    </select>
+                    <select id="category" required></select>
+                </div>
+                <button type="submit" id="btn-submit-form" style="font-size: 18px;">Adicionar</button>
+            </form>
+        </div>
+
+        <div class="transactions-container">
+            <div class="transactions-header">
+                <h3>Histórico de Transações</h3>
+                <button type="button" class="btn-danger-clear" onclick="clearAllHistory()">EXCLUIR HISTÓRICO</button>
+            </div>
+
+            <div class="filters-container">
+                <input type="text" id="filter-desc" placeholder="Pesquisar" oninput="init()">
+                <select id="filter-cat" onchange="init()">
+                    <option value="">Categoria</option>
+                </select>
+                
+                <select id="filter-type" style="display: none;">
+                    <option value="" selected>Todos</option>
+                </select>
+
+                <div id="filter-total-display" class="category-total-badge" style="font-size: 18px;" >Total: R$ 0,00</div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Descrição</th>
+                        <th>Categoria</th>
+                        <th>Valor</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="transaction-list"></tbody>
+            </table>
+        </div>
+    </div>
+
+        <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyCTC8A9FYStJBNHh-L4-qM7S7t3qqRBdCU",
+          authDomain: "controle-financeiro-19ae8.firebaseapp.com",
+          databaseURL: "https://controle-financeiro-19ae8-default-rtdb.europe-west1.firebasedatabase.app",
+          projectId: "controle-financeiro-19ae8",
+          storageBucket: "controle-financeiro-19ae8.firebasestorage.app",
+          messagingSenderId: "765505633367",
+          appId: "1:765505633367:web:749155f0c9c5fcb5aeb712",
+          measurementId: "G-3VHZQCHGBJ"
+        };
+
+        const expenseCategories = ["Casa", "Saúde", "Carro", "Meninas", "Alimentação", "Mercado", "Manutenção", "Lazer", "Viagem", "Conforto", "JW", "Beleza", "Outros"];
+        const incomeCategories = ["Pagamento", "Camila", "VA"];
+
+        const form = document.getElementById('transaction-form');
+        const btnSubmitForm = document.getElementById('btn-submit-form');
+        const descriptionInput = document.getElementById('description');
+        const amountInput = document.getElementById('amount');
+        const typeInput = document.getElementById('type');
+        const categoryInput = document.getElementById('category');
+        const transactionList = document.getElementById('transaction-list');
+        const balanceDisplay = document.getElementById('balance-display');
+        const incomeDisplay = document.getElementById('income-display');
+        const expenseDisplay = document.getElementById('expense-display');
+        const syncKeyInput = document.getElementById('sync-key');
+        const syncStatus = document.getElementById('sync-status');
+        const modal = document.getElementById('sync-modal');
+        const filterTotalDisplay = document.getElementById('filter-total-display');
+
+        let transactions = [];
+        let database = null;
+        let currentRef = null;
+        let editingTransactionId = null;
+
+        // CONTROLE DO MODAL DE SINCRONIZAÇÃO
+        function toggleModal() {
+            modal.classList.toggle('active');
+        }
+
+        function closeModal(event) {
+            if (event.target === modal) {
+                toggleModal();
+            }
+        }
+
+        // ALTERA AS CATEGORIAS DO FORMULÁRIO DINAMICAMENTE
+        function handleTypeChange() {
+            const type = typeInput.value;
+            categoryInput.innerHTML = '';
+            const categories = type === 'expense' ? expenseCategories : incomeCategories;
+            
+            categories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                categoryInput.appendChild(opt);
+            });
+        }
+
+        // POPULA O FILTRO DE CATEGORIAS DO HISTÓRICO
+        function populateCategoryFilter() {
+            const filterCat = document.getElementById('filter-cat');
+            const currentSelection = filterCat.value;
+            filterCat.innerHTML = '<option value="">Categoria</option>';
+            
+            const allCategories = [...new Set([...expenseCategories, ...incomeCategories])];
+            allCategories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                filterCat.appendChild(opt);
+            });
+            filterCat.value = currentSelection;
+        }
+
+        // CONEXÃO COM O FIREBASE
+        function connectToFirebase() {
+            const key = syncKeyInput.value.trim();
+            if (!key) {
+                syncStatus.textContent = "Digite uma chave válida.";
+                return;
+            }
+            localStorage.setItem('sync_key', key);
+            initializeDatabase(key);
+        }
+
+        function initializeDatabase(key) {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            database = firebase.database();
+            currentRef = database.ref('financas/' + key);
+            syncStatus.textContent = "Conectado com sucesso!";
+            
+            currentRef.on('value', snapshot => {
+                const data = snapshot.val();
+                transactions = [];
+                if (data) {
+                    for (let id in data) {
+                        transactions.push({ id, ...data[id] });
+                    }
+                }
+                populateCategoryFilter();
+                init();
+            });
+        }
+
+        // FUNÇÃO DE INICIALIZAÇÃO E CÁLCULO DE SOMA DINÂMICA
+        function init() {
+            const filterDescValue = document.getElementById('filter-desc').value.toLowerCase();
+            const filterCatValue = document.getElementById('filter-cat').value;
+
+            const filteredTransactions = transactions.filter(t => {
+                const matchesDesc = t.description.toLowerCase().includes(filterDescValue);
+                const matchesCat = !filterCatValue || t.category === filterCatValue;
+                return matchesDesc && matchesCat;
+            });
+
+            // Lógica do mostrador unificado de somatória
+            if (filterCatValue) {
+                const categorySum = filteredTransactions.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
+                filterTotalDisplay.textContent = ` R$ ${categorySum.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                filterTotalDisplay.style.backgroundColor = "var(--primary)";
+            } else {
+                const totalFiltered = filteredTransactions.reduce((acc, curr) => {
+                    return curr.type === 'income' ? acc + parseFloat(curr.amount) : acc - parseFloat(curr.amount);
+                }, 0);
+                filterTotalDisplay.textContent = `R$ 0,00`;
+                filterTotalDisplay.style.backgroundColor = "var(--primary)";
+            }
+
+            renderTable(filteredTransactions);
+            updateDashboard();
+        }
+
+        // RENDERIZAÇÃO DA TABELA DE HISTÓRICO
+        function renderTable(filtered) {
+    transactionList.innerHTML = '';
+    filtered.forEach(t => {
+        const tr = document.createElement('tr');
+        const isIncome = t.type === 'income';
+        
+        tr.innerHTML = `
+            <td>${t.description}</td>
+            <td><span class="badge badge-category">${t.category}</span></td>
+            <td class="${t.type}">${isIncome ? '+':'-'} ${parseFloat(t.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+            <td>
+                <button class="btn-edit" onclick="editTransaction('${t.id}')"><span class="badge badge-info">Editar</span></button>
+                <button class="btn-edit" onclick="deleteTransaction('${t.id}')"><span class="badge badge-danger">Excluir</span></button>
+            </td>
+        `;
+        transactionList.appendChild(tr);
+    });
+}
+
+
+        // ATUALIZA OS VALORES DOS CARDS PRINCIPAIS
+        function updateDashboard() {
+            let income = 0;
+            let expense = 0;
+
+            transactions.forEach(t => {
+                if (t.type === 'income') income += parseFloat(t.amount);
+                else expense += parseFloat(t.amount);
+            });
+
+            const balance = income - expense;
+
+            balanceDisplay.textContent = `R$ ${balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+            incomeDisplay.textContent = `R$ ${income.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+            expenseDisplay.textContent = `R$ ${expense.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+        }
+
+        // ENVIO DO FORMULÁRIO (ADICIONAR / SALVAR ALTERAÇÃO)
+        form.addEventListener('submit', event => {
+            event.preventDefault();
+            
+            const data = {
+                description: descriptionInput.value,
+                amount: parseFloat(amountInput.value),
+                type: typeInput.value,
+                category: categoryInput.value
+            };
+
+            if (editingTransactionId) {
+                if (currentRef) {
+                    currentRef.child(editingTransactionId).set(data);
+                } else {
+                    const idx = transactions.findIndex(t => t.id === editingTransactionId);
+                    transactions[idx] = { id: editingTransactionId, ...data };
+                    init();
+                }
+                editingTransactionId = null;
+                btnSubmitForm.textContent = 'Adicionar';
+            } else {
+                if (currentRef) {
+                    currentRef.push(data);
+                } else {
+                    transactions.push({ id: Date.now().toString(), ...data });
+                    init();
+                }
+            }
+
+            form.reset();
+            handleTypeChange();
+        });
+
+        // FUNÇÕES DE EDICÃO, EXCLUSÃO E LIMPEZA
+        function editTransaction(id) {
+            const t = transactions.find(item => item.id === id);
+            if (!t) return;
+
+            descriptionInput.value = t.description;
+            amountInput.value = t.amount;
+            typeInput.value = t.type;
+            handleTypeChange();
+            categoryInput.value = t.category;
+            
+            editingTransactionId = id;
+            btnSubmitForm.textContent = 'Salvar Alteração';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function deleteTransaction(id) {
+            if (!confirm("Excluir esta transação?")) return;
+            if (currentRef) {
+                currentRef.child(id).remove();
+            } else {
+                transactions = transactions.filter(t => t.id !== id);
+                init();
+            }
+        }
+
+        function clearAllHistory() {
+            if (!confirm("AVISO: Isso apagará TODO o seu histórico de transações. Continuar?")) return;
+            if (currentRef) {
+                currentRef.remove();
+            } else {
+                transactions = [];
+                init();
+            }
+        }
+
+        // DISPARO AUTOMÁTICO AO CARREGAR A PÁGINA
+        handleTypeChange();
+        const savedKey = localStorage.getItem('sync_key');
+        if (savedKey) {
+            syncKeyInput.value = savedKey;
+            initializeDatabase(savedKey);
+        } else {
+            syncStatus.textContent = "Modo Local (Sem nuvem conectada).";
+            populateCategoryFilter();
+            init();
+        }
+    </script>
+</body>
+</html>
