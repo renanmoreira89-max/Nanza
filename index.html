@@ -75,7 +75,7 @@
             border-radius: 20px;
             background-color: var(--accent);
             color: white;
-            font-weight: bold;
+            font-weight: 700;
             border: 1px;
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(79, 160, 149, 0.2);
@@ -237,7 +237,7 @@
 
         .card p {
             font-size: 1.8rem;
-            font-weight: 900;
+            font-weight: 700;
             letter-spacing: -0.5px;
         }
 
@@ -262,16 +262,75 @@
             border: 1px solid var(--border-color);
         }
 
-        .form-group {
+        .form-group-full {
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .form-group-full input {
+            width: 100%;
+        }
+
+        .form-group-fields {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
             margin-bottom: 14px;
         }
 
-        .form-group input, .form-group select {
+        .form-group-fields .field-wrapper, 
+        .form-group-fields #amount {
             flex: 1;
             min-width: 130px;
+            position: relative;
+        }
+
+        /* ESTILIZAÇÃO DAS CÉLULAS MÁSCARA DO FORMULÁRIO */
+        .custom-input-wrapper {
+            position: relative;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .custom-input-wrapper:focus-within {
+            border-color: var(--accent);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(79, 160, 149, 0.15);
+        }
+
+        .custom-input-wrapper select,
+        .custom-input-wrapper input[type="date"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .custom-input-wrapper .field-label {
+            color: var(--primary);
+            font-size: 1.1rem;
+            user-select: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 12px;
+        }
+
+        .custom-input-wrapper .field-arrow {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            user-select: none;
         }
 
         input, select, button {
@@ -339,39 +398,81 @@
 
         .transactions-container h2 {
             font-size: 1.5rem;
-            font-weight: bold;
+            font-weight: 700;
         }
 
         .filters-container {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin-bottom: 16px;
-            flex-wrap: wrap;
         }
 
-        .filters-container input, .filters-container select {
-            flex: 1;
-            min-width: 130px;
+        .filters-container input, 
+        .filters-container select, 
+        .filters-container .category-total-badge,
+        .filters-container .date-filter-wrapper {
+            width: 100%;
+            height: 45px;
             padding: 8px 12px;
             font-size: 1rem;
-            height: 40px;
+            margin: 0;
+            box-sizing: border-box;
         }
 
-        .filters-container input {
-            flex: 2;
+        .date-filter-wrapper {
+            position: relative;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 16px !important;
+        }
+
+        .date-filter-wrapper:focus-within {
+            border-color: var(--accent);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(79, 160, 149, 0.15);
+        }
+
+        .date-filter-wrapper input[type="date"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+        }
+
+        .date-filter-wrapper .date-label {
+            color: var(--primary);
+            font-size: 1rem;
+            user-select: none;
+        }
+
+        .date-filter-wrapper .date-label.placeholder {
+            color: #757575;
+        }
+
+        .date-filter-wrapper .date-arrow {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            user-select: none;
         }
 
         .category-total-badge {
-            flex: 1;
-            min-width: 140px;
-            height: 40px;
             background-color: var(--accent);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 22px;
-            font-weight: bold;
+            font-weight: 700;
             font-size: 0.9rem;
             padding: 0 12px;
             text-align: center;
@@ -396,7 +497,7 @@
         th {
             background-color: #ffffff;
             color: var(--text-secondary);
-            font-weight: bold;
+            font-weight: 700;
             font-size: 0.8rem;
             text-transform: uppercase;
         }
@@ -405,7 +506,7 @@
             display: inline-block;
             padding: 2px 8px;
             font-size: 12px;
-            font-weight: bold;
+            font-weight: 700;
             text-align: center;
             border-radius: 8px;
         }
@@ -490,14 +591,42 @@
 
         <div class="form-container">
             <form id="transaction-form">
-                <div class="form-group">
+                <div class="form-group-full">
                     <input type="text" id="description" placeholder="Descrição" required>
+                </div>
+                <div class="form-group-fields">
+                    <!-- DATA -->
+                    <div class="field-wrapper">
+                        <div class="custom-input-wrapper">
+                            <span id="form-date-label" class="field-label">Data</span>
+                            <span class="field-arrow">▼</span>
+                            <input type="date" id="date" required onchange="updateFormDateLabel(this)">
+                        </div>
+                    </div>
+
+                    <!-- VALOR -->
                     <input type="number" id="amount" placeholder="Valor (R$)" step="0.01" required>
-                    <select id="type" onchange="handleTypeChange()">
-                        <option value="expense" selected>Despesa</option>
-                        <option value="income">Receita</option>
-                    </select>
-                    <select id="category" required></select>
+
+                    <!-- TIPO -->
+                    <div class="field-wrapper">
+                        <div class="custom-input-wrapper">
+                            <span id="form-type-label" class="field-label">Despesa</span>
+                            <span class="field-arrow">▼</span>
+                            <select id="type" onchange="handleTypeChange()">
+                                <option value="expense" selected>Despesa</option>
+                                <option value="income">Receita</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- CATEGORIA -->
+                    <div class="field-wrapper">
+                        <div class="custom-input-wrapper">
+                            <span id="form-category-label" class="field-label">Categoria</span>
+                            <span class="field-arrow">▼</span>
+                            <select id="category" required onchange="updateFormCategoryLabel(this)"></select>
+                        </div>
+                    </div>
                 </div>
                 <button type="submit" id="btn-submit-form" style="font-size: 18px;">Adicionar</button>
             </form>
@@ -511,6 +640,13 @@
 
             <div class="filters-container">
                 <input type="text" id="filter-desc" placeholder="Pesquisar" oninput="init()">
+                
+                <div class="date-filter-wrapper">
+                    <span id="filter-date-label" class="date-label placeholder">Data</span>
+                    <span class="date-arrow">▼</span>
+                    <input type="date" id="filter-date" onchange="updateFilterDateLabel(this)">
+                </div>
+                
                 <select id="filter-cat" onchange="init()">
                     <option value="">Categoria</option>
                 </select>
@@ -525,6 +661,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th>Data</th>
                         <th>Descrição</th>
                         <th>Categoria</th>
                         <th>Valor</th>
@@ -536,7 +673,7 @@
         </div>
     </div>
 
-        <script>
+    <script>
         const firebaseConfig = {
           apiKey: "AIzaSyCTC8A9FYStJBNHh-L4-qM7S7t3qqRBdCU",
           authDomain: "controle-financeiro-19ae8.firebaseapp.com",
@@ -554,6 +691,7 @@
         const form = document.getElementById('transaction-form');
         const btnSubmitForm = document.getElementById('btn-submit-form');
         const descriptionInput = document.getElementById('description');
+        const dateInput = document.getElementById('date');
         const amountInput = document.getElementById('amount');
         const typeInput = document.getElementById('type');
         const categoryInput = document.getElementById('category');
@@ -571,7 +709,49 @@
         let currentRef = null;
         let editingTransactionId = null;
 
-        // CONTROLE DO MODAL DE SINCRONIZAÇÃO
+        // FUNÇÕES PARA ATUALIZAR OS TEXTOS VISUAIS DO FORMULÁRIO
+        function updateFormDateLabel(input) {
+            const label = document.getElementById('form-date-label');
+            if (input.value) {
+                const parts = input.value.split('-');
+                label.textContent = `${parts[2]}/${parts[1]}/${parts[0]}`;
+            } else {
+                label.textContent = 'Data';
+            }
+        }
+
+        function updateFormTypeLabel() {
+            const label = document.getElementById('form-type-label');
+            label.textContent = typeInput.options[typeInput.selectedIndex]?.text || 'Despesa';
+        }
+
+        function updateFormCategoryLabel() {
+            const label = document.getElementById('form-category-label');
+            label.textContent = categoryInput.options[categoryInput.selectedIndex]?.text || 'Categoria';
+        }
+
+        function setDefaultDate() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            dateInput.value = `${yyyy}-${mm}-${dd}`;
+            updateFormDateLabel(dateInput);
+        }
+
+        function updateFilterDateLabel(input) {
+            const label = document.getElementById('filter-date-label');
+            if (input.value) {
+                const parts = input.value.split('-');
+                label.textContent = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                label.classList.remove('placeholder');
+            } else {
+                label.textContent = 'Data';
+                label.classList.add('placeholder');
+            }
+            init();
+        }
+
         function toggleModal() {
             modal.classList.toggle('active');
         }
@@ -582,7 +762,6 @@
             }
         }
 
-        // ALTERA AS CATEGORIAS DO FORMULÁRIO DINAMICAMENTE
         function handleTypeChange() {
             const type = typeInput.value;
             categoryInput.innerHTML = '';
@@ -594,9 +773,10 @@
                 opt.textContent = cat;
                 categoryInput.appendChild(opt);
             });
+            updateFormTypeLabel();
+            updateFormCategoryLabel();
         }
 
-        // POPULA O FILTRO DE CATEGORIAS DO HISTÓRICO
         function populateCategoryFilter() {
             const filterCat = document.getElementById('filter-cat');
             const currentSelection = filterCat.value;
@@ -612,7 +792,6 @@
             filterCat.value = currentSelection;
         }
 
-        // CONEXÃO COM O FIREBASE
         function connectToFirebase() {
             const key = syncKeyInput.value.trim();
             if (!key) {
@@ -644,56 +823,67 @@
             });
         }
 
-        // FUNÇÃO DE INICIALIZAÇÃO E CÁLCULO DE SOMA DINÂMICA
-        function init() {
-            const filterDescValue = document.getElementById('filter-desc').value.toLowerCase();
-            const filterCatValue = document.getElementById('filter-cat').value;
+                function init() {
+    const filterDescValue = document.getElementById('filter-desc').value.toLowerCase();
+    const filterCatValue = document.getElementById('filter-cat').value;
+    const filterDateValue = document.getElementById('filter-date').value;
 
-            const filteredTransactions = transactions.filter(t => {
-                const matchesDesc = t.description.toLowerCase().includes(filterDescValue);
-                const matchesCat = !filterCatValue || t.category === filterCatValue;
-                return matchesDesc && matchesCat;
-            });
+    // --- LINHA ADICIONADA: Ordena as transações por data (mais recente primeiro) ---
+    transactions.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
-            // Lógica do mostrador unificado de somatória
-            if (filterCatValue) {
-                const categorySum = filteredTransactions.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
-                filterTotalDisplay.textContent = ` R$ ${categorySum.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                filterTotalDisplay.style.backgroundColor = "var(--primary)";
-            } else {
-                const totalFiltered = filteredTransactions.reduce((acc, curr) => {
-                    return curr.type === 'income' ? acc + parseFloat(curr.amount) : acc - parseFloat(curr.amount);
-                }, 0);
-                filterTotalDisplay.textContent = `R$ 0,00`;
-                filterTotalDisplay.style.backgroundColor = "var(--primary)";
-            }
-
-            renderTable(filteredTransactions);
-            updateDashboard();
-        }
-
-        // RENDERIZAÇÃO DA TABELA DE HISTÓRICO
-        function renderTable(filtered) {
-    transactionList.innerHTML = '';
-    filtered.forEach(t => {
-        const tr = document.createElement('tr');
-        const isIncome = t.type === 'income';
-        
-        tr.innerHTML = `
-            <td>${t.description}</td>
-            <td><span class="badge badge-category">${t.category}</span></td>
-            <td class="${t.type}">${isIncome ? '+':'-'} ${parseFloat(t.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-            <td>
-                <button class="btn-edit" onclick="editTransaction('${t.id}')"><span class="badge badge-info">Editar</span></button>
-                <button class="btn-edit" onclick="deleteTransaction('${t.id}')"><span class="badge badge-danger">Excluir</span></button>
-            </td>
-        `;
-        transactionList.appendChild(tr);
+    const filteredTransactions = transactions.filter(t => {
+        const matchesDesc = t.description.toLowerCase().includes(filterDescValue);
+        const matchesCat = !filterCatValue || t.category === filterCatValue;
+        const matchesDate = !filterDateValue || t.date === filterDateValue;
+        return matchesDesc && matchesCat && matchesDate;
     });
+
+    if (filterCatValue || filterDateValue || filterDescValue) {
+        const totalFiltered = filteredTransactions.reduce((acc, curr) => {
+            return curr.type === 'income' ? acc + parseFloat(curr.amount) : acc - parseFloat(curr.amount);
+        }, 0);
+        
+        filterTotalDisplay.textContent = Math.abs(totalFiltered).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        filterTotalDisplay.style.backgroundColor = "var(--primary)";
+    } else {
+        filterTotalDisplay.textContent = `0,00`;
+        filterTotalDisplay.style.backgroundColor = "var(--primary)";
+    }
+
+    renderTable(filteredTransactions);
+    updateDashboard();
 }
 
 
-        // ATUALIZA OS VALORES DOS CARDS PRINCIPAIS
+
+        function renderTable(filtered) {
+            transactionList.innerHTML = '';
+            filtered.forEach(t => {
+                const tr = document.createElement('tr');
+                const isIncome = t.type === 'income';
+                
+                let displayDate = '-';
+                if (t.date) {
+                    const parts = t.date.split('-');
+                    if (parts.length === 3) {
+                        displayDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    }
+                }
+                
+                tr.innerHTML = `
+                    <td>${displayDate}</td>
+                    <td>${t.description}</td>
+                    <td><span class="badge badge-category">${t.category}</span></td>
+                    <td class="${t.type}">${isIncome ? '+' : '-'} ${parseFloat(t.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                    <td>
+                        <button class="btn-edit" onclick="editTransaction('${t.id}')"><span class="badge badge-info">Editar</span></button>
+                        <button class="btn-edit" onclick="deleteTransaction('${t.id}')"><span class="badge badge-danger">Excluir</span></button>
+                    </td>
+                `;
+                transactionList.appendChild(tr);
+            });
+        }
+
         function updateDashboard() {
             let income = 0;
             let expense = 0;
@@ -710,12 +900,12 @@
             expenseDisplay.textContent = `R$ ${expense.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
         }
 
-        // ENVIO DO FORMULÁRIO (ADICIONAR / SALVAR ALTERAÇÃO)
         form.addEventListener('submit', event => {
             event.preventDefault();
             
             const data = {
                 description: descriptionInput.value,
+                date: dateInput.value,
                 amount: parseFloat(amountInput.value),
                 type: typeInput.value,
                 category: categoryInput.value
@@ -742,18 +932,23 @@
 
             form.reset();
             handleTypeChange();
+            setDefaultDate();
         });
 
-        // FUNÇÕES DE EDICÃO, EXCLUSÃO E LIMPEZA
         function editTransaction(id) {
             const t = transactions.find(item => item.id === id);
             if (!t) return;
 
             descriptionInput.value = t.description;
+            dateInput.value = t.date || '';
             amountInput.value = t.amount;
             typeInput.value = t.type;
             handleTypeChange();
             categoryInput.value = t.category;
+            
+            updateFormDateLabel(dateInput);
+            updateFormTypeLabel();
+            updateFormCategoryLabel();
             
             editingTransactionId = id;
             btnSubmitForm.textContent = 'Salvar Alteração';
@@ -780,8 +975,9 @@
             }
         }
 
-        // DISPARO AUTOMÁTICO AO CARREGAR A PÁGINA
         handleTypeChange();
+        setDefaultDate();
+        
         const savedKey = localStorage.getItem('sync_key');
         if (savedKey) {
             syncKeyInput.value = savedKey;
