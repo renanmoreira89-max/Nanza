@@ -3,7 +3,7 @@ const URLS_TO_CACHE = [
   '/Nanza/',
   '/Nanza/index.html',
   '/Nanza/manifest.json',
-  '/Nanza/1000320254.png'
+  '/Nanza/1000321047%20(1).png'
 ];
 
 // Instala o service worker e faz cache dos arquivos essenciais
