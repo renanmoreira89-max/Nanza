@@ -1,0 +1,46 @@
+{
+  "name": "Controle Financeiro",
+  "short_name": "Nanza",
+  "description": "Aplicação de controle financeiro pessoal com sincronização em nuvem",
+  "start_url": "/Nanza/",
+  "scope": "/Nanza/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#1A3C38",
+  "background_color": "#F0F0F0",
+  "icons": [
+    {
+      "src": "1000321047%20(1).png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "1000321047%20(1).png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "1000321047%20(1).png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "1000321047%20(1).png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["finance", "productivity"],
+  "screenshots": [
+    {
+      "src": "1000321047%20(1).png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ]
+}
