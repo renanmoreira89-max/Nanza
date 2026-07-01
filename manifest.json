@@ -1,9 +1,9 @@
 {
   "name": "Controle Financeiro",
-  "short_name": "BellaZô",
+  "short_name": "BellaZo",
   "description": "Aplicação de controle financeiro pessoal com sincronização em nuvem",
-  "start_url": "/BellaZô/",
-  "scope": "/BellaZô/",
+  "start_url": "/BellaZo/",
+  "scope": "/BellaZo/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "theme_color": "#1A3C38",
