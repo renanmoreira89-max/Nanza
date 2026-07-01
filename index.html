@@ -7,12 +7,17 @@
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#1A3C38">
+    <meta name="description" content="Aplicação de controle financeiro pessoal com sincronização em nuvem">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Nanza">
     
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="1000321047%20(1).png">
     
-    <link class="favicon-png" rel="icon" type="image/png" sizes="192x192" href="1000320254.png">
-    <link class="favicon-png" rel="icon" type="image/png" sizes="512x512" href="1000320254.png">
-    <link class="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="1000321047%20(1).png">
+    <link rel="icon" type="image/png" sizes="512x512" href="1000321047%20(1).png">
+    <link rel="manifest" href="manifest.json">
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -973,6 +978,13 @@
                 transactions = [];
                 init();
             }
+        }
+
+        // Registra o service worker para PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(reg => console.log('Service Worker registrado com sucesso:', reg))
+                .catch(err => console.log('Erro ao registrar Service Worker:', err));
         }
 
         handleTypeChange();
