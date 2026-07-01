@@ -1,9 +1,9 @@
-const CACHE_NAME = 'nanza-v1';
+const CACHE_NAME = 'bellazo-v1';
 const URLS_TO_CACHE = [
-  '/Nanza/',
-  '/Nanza/index.html',
-  '/Nanza/manifest.json',
-  '/Nanza/1000321047%20(1).png'
+  '/BellaZo/',
+  '/BellaZo/index.html',
+  '/BellaZo/manifest.json',
+  '/BellaZo/1000321047%20(1).png'
 ];
 
 // Instala o service worker e faz cache dos arquivos essenciais
